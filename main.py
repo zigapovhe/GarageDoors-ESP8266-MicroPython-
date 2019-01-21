@@ -6,7 +6,9 @@ import urequests
 import ujson
 import network
 import time
+from hcsr04 import HCSR04
 
+sensor = HCSR04(trigger_pin=13, echo_pin=12)
 PIN_DHT = 2
 PIN_RELAY = 5
 TRIGGER_SLEEP = 0.5
@@ -86,16 +88,19 @@ def run_loop():
 		time.sleep(0.5) # check to open the door every 0.5 secs
 		connect_wireless()
 		print("Status: Sending data via POST to server!")
+		distance = sensor.distance_cm()
+		#print('Distance:', distance, 'cm')
 		timer = timer + 1
 		if timer >= 4:
 			d.measure()
-			print("temp:", d.temperature())
-			print("hum:", d.humidity())
+			#print("temp:", d.temperature())
+			#print("hum:", d.humidity())
 			timer = 0
 		# post_data(d)
 		data = {
 		"temp": d.temperature(),
-		"hum": d.humidity()
+		"hum": d.humidity(),
+		"distance": distance
 			}
 		headers = {'content-type': 'application/json'}
 		jsondata = ujson.dumps(data)
